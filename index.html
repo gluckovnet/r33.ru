@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R33.ru — Рекламное агентство полного цикла | Владимирская область</title>
+<meta name="description" content="Единое окно для всей рекламы в 33 регионе: сайты, наружная реклама, ТВ, СМИ, блогеры. Партнёрская программа.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        accent:   '#3b82f6',
+        accent2:  '#7c3aed',
+        accent3:  '#ec4899',
+        surface:  '#111118',
+        panel:    '#1a1a24',
+        border:   '#2a2a3a',
+        fg:       '#e4e4ef',
+        'fg-muted': '#94949f',
+        'fg-soft': '#5a5a6a',
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+    },
+  },
+}
+</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"></noscript>
+<script>
+(function(){var r=document.querySelector('link[href*="remixicon@4.5"]');if(r)r.onerror=function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.min.css';document.head.appendChild(l)}})();
+</script>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/svg+xml" href="/icons/icon-192.svg">
+<link rel="apple-touch-icon" href="/icons/icon-192.svg">
+<style>
+  body { background: #0a0a0f; color: #e4e4ef; font-family: 'Inter', system-ui, sans-serif; }
+  .gradient-text { background: linear-gradient(135deg, #3b82f6, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .card { background: #1a1a24; border: 1px solid #2a2a3a; border-radius: 1rem; transition: border-color .2s, transform .2s; }
+  .card:hover { border-color: #3b82f6; transform: translateY(-2px); }
+  .blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: .15; pointer-events: none; }
+  .eye-icon { display: inline-flex; align-items: center; gap: .5rem; font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #94949f; }
+  .btn-primary { display: inline-flex; align-items: center; gap: .5rem; padding: .75rem 1.5rem; border-radius: .75rem; font-weight: 600; font-size: .875rem; background: linear-gradient(135deg, #3b82f6, #7c3aed); color: #fff; transition: opacity .2s, transform .2s; }
+  .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+  .btn-ghost { display: inline-flex; align-items: center; gap: .5rem; padding: .75rem 1.5rem; border-radius: .75rem; font-weight: 600; font-size: .875rem; border: 1px solid #2a2a3a; color: #e4e4ef; transition: border-color .2s; }
+  .btn-ghost:hover { border-color: #3b82f6; }
+  .check-row { display: flex; align-items: center; justify-content: space-between; padding: .75rem 1rem; border-radius: .5rem; cursor: pointer; transition: background .15s; }
+  .check-row:hover { background: #2a2a3a; }
+  .nav-link { padding: .5rem .75rem; border-radius: .5rem; font-size: .875rem; font-weight: 500; color: #94949f; transition: color .2s, background .2s; white-space: nowrap; flex-shrink: 0; }
+  .nav-link:hover { color: #e4e4ef; background: rgba(255,255,255,.05); }
+  .nav-link.active { color: #3b82f6; background: rgba(59,130,246,.1); }
+  .eyebrow { display: inline-flex; align-items: center; gap: .5rem; font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .ri-fw { width: 1.25em; text-align: center; display: inline-block; }
+  @media (max-width: 640px) {
+    .nav-link { padding: .5rem .6rem; font-size: .8125rem; }
+  }
+  .leaflet-container { background: #0a0a0f !important; }
+  .leaflet-control-zoom a { background: #1a1a24 !important; color: #e4e4ef !important; border-color: #2a2a3a !important; }
+  .leaflet-popup-content-wrapper { background: #1a1a24 !important; color: #e4e4ef !important; border: 1px solid #2a2a3a !important; border-radius: .75rem !important; }
+  .leaflet-popup-tip { background: #1a1a24 !important; }
+  .map-tiles { filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(0.9); }
+</style>
+</head>
+<body x-data="app()" x-init="init()" class="antialiased min-h-screen">
+
+<!-- ====== TOPBAR ====== -->
+<div class="hidden md:block border-b border-border" style="background: #111118;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-10 text-sm text-fg-muted">
+      <div class="flex items-center gap-6">
+        <a href="tel:+74922494222" class="flex items-center gap-2 hover:text-fg transition-colors">
+          <i class="ri-phone-fill text-accent text-xs"></i> +7 (4922) 49-42-22
+        </a>
+        <a href="tel:+79050551100" class="flex items-center gap-2 hover:text-fg transition-colors">
+          <i class="ri-smartphone-fill text-accent text-xs"></i> +7 (905) 055-11-00
+        </a>
+        <a href="mailto:info@r33.ru" class="hidden lg:flex items-center gap-2 hover:text-fg transition-colors">
+          <i class="ri-mail-fill text-accent text-xs"></i> info@r33.ru
+        </a>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="work-status" class="flex items-center gap-2 text-emerald-400 text-xs font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" data-dot></span>
+          <span data-text>онлайн</span>
+        </span>
+        <span class="text-border">|</span>
+        <a href="https://t.me/r33_ru" aria-label="Telegram" target="_blank" rel="noopener" class="hover:text-fg transition-colors"><i class="ri-telegram-fill text-sm"></i></a>
+        <a href="https://vk.com/r33_ru" aria-label="VK" target="_blank" rel="noopener" class="hover:text-fg transition-colors"><i class="ri-vk-fill text-sm"></i></a>
+        <a href="https://wa.me/+79050551100" aria-label="WhatsApp" target="_blank" rel="noopener" class="hover:text-fg transition-colors" style="color:#25D366"><i class="ri-whatsapp-fill text-sm"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ГЛОБАЛЬНЫЙ ХЕДЕР ====== -->
+<header class="sticky top-0 z-50 border-b border-border" style="background: rgba(10,10,15,.85); backdrop-filter: blur(16px);">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- Лого -->
+      <a href="/" class="flex items-center gap-2.5 shrink-0">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-accent2 flex items-center justify-center text-white font-extrabold text-sm">R</div>
+        <span class="text-lg font-bold tracking-tight">R33<span class="text-fg-muted font-normal">.ru</span></span>
+      </a>
+
+      <!-- Client Nav (на десктопе) -->
+      <template x-if="mode === 'client'">
+        <nav class="hidden lg:flex items-center gap-1 mx-4 overflow-x-auto">
+          <a href="#hero" @click.prevent="scrollTo('hero')" class="nav-link" :class="{active: activeSection==='hero'}">Главная</a>
+          <a href="#services" @click.prevent="scrollTo('services')" class="nav-link" :class="{active: activeSection==='services'}">Услуги</a>
+          <a href="#calculator" @click.prevent="scrollTo('calculator')" class="nav-link" :class="{active: activeSection==='calculator'}">Калькулятор</a>
+          <a href="#portfolio" @click.prevent="scrollTo('portfolio')" class="nav-link" :class="{active: activeSection==='portfolio'}">Проекты</a>
+          <a href="#contacts" @click.prevent="scrollTo('contacts')" class="nav-link" :class="{active: activeSection==='contacts'}">Контакты</a>
+        </nav>
+      </template>
+
+      <!-- Career Nav (на десктопе) -->
+      <template x-if="mode === 'career'">
+        <nav class="hidden lg:flex items-center gap-1 mx-4 overflow-x-auto">
+          <a href="#career-hero" @click.prevent="scrollTo('career-hero')" class="nav-link" :class="{active: activeSection==='career-hero'}">Партнёрство</a>
+          <a href="#city-map" @click.prevent="scrollTo('city-map')" class="nav-link" :class="{active: activeSection==='city-map'}">Города</a>
+          <a href="#payouts" @click.prevent="scrollTo('payouts')" class="nav-link" :class="{active: activeSection==='payouts'}">Выплаты</a>
+          <a href="#partner-form" @click.prevent="scrollTo('partner-form')" class="nav-link" :class="{active: activeSection==='partner-form'}">Заявка</a>
+        </nav>
+      </template>
+
+      <!-- Правая часть: переключатель + CRM + мобильное меню -->
+      <div class="flex items-center gap-2">
+        <div class="flex bg-panel rounded-xl p-0.5 border border-border">
+          <button @click="switchMode('client')"
+            :class="mode === 'client' ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'text-fg-muted hover:text-fg'"
+            class="px-3 py-1.5 text-xs sm:text-sm font-medium rounded-[10px] transition-all duration-200">
+            <i class="ri-store-2-line mr-1 sm:mr-1.5"></i><span class="hidden sm:inline">Услуги</span><span class="sm:hidden">Усл</span>
+          </button>
+          <button @click="switchMode('career')"
+            :class="mode === 'career' ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'text-fg-muted hover:text-fg'"
+            class="px-3 py-1.5 text-xs sm:text-sm font-medium rounded-[10px] transition-all duration-200">
+            <i class="ri-team-line mr-1 sm:mr-1.5"></i><span class="hidden sm:inline">Карьера</span><span class="sm:hidden">Кар</span>
+          </button>
+        </div>
+        <a href="https://lk.r33.ru"
+          @click.prevent="crmClick"
+          class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-xs sm:text-sm font-medium rounded-xl border border-border text-fg-muted hover:text-fg hover:border-accent transition-all duration-200">
+          <i class="ri-user-3-line"></i>
+          <span class="hidden md:inline">Войти в CRM</span>
+        </a>
+        <!-- Mobile menu trigger -->
+        <button @click="mobileMenuOpen = !mobileMenuOpen" class="lg:hidden p-2 text-fg-muted hover:text-fg">
+          <i class="ri-menu-line text-xl"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile nav (client/career) -->
+    <div x-show="mobileMenuOpen" x-transition class="lg:hidden border-t border-border py-3 space-y-1" style="background: rgba(10,10,15,.95);">
+      <template x-if="mode === 'client'">
+        <div>
+          <a href="#hero" @click.prevent="scrollTo('hero'); mobileMenuOpen=false" class="block nav-link w-full text-left">Главная</a>
+          <a href="#services" @click.prevent="scrollTo('services'); mobileMenuOpen=false" class="block nav-link w-full text-left">Услуги</a>
+          <a href="#calculator" @click.prevent="scrollTo('calculator'); mobileMenuOpen=false" class="block nav-link w-full text-left">Калькулятор</a>
+          <a href="#portfolio" @click.prevent="scrollTo('portfolio'); mobileMenuOpen=false" class="block nav-link w-full text-left">Проекты</a>
+          <a href="#contacts" @click.prevent="scrollTo('contacts'); mobileMenuOpen=false" class="block nav-link w-full text-left">Контакты</a>
+        </div>
+      </template>
+      <template x-if="mode === 'career'">
+        <div>
+          <a href="#career-hero" @click.prevent="scrollTo('career-hero'); mobileMenuOpen=false" class="block nav-link w-full text-left">Партнёрство</a>
+          <a href="#city-map" @click.prevent="scrollTo('city-map'); mobileMenuOpen=false" class="block nav-link w-full text-left">Города</a>
+          <a href="#payouts" @click.prevent="scrollTo('payouts'); mobileMenuOpen=false" class="block nav-link w-full text-left">Выплаты</a>
+          <a href="#partner-form" @click.prevent="scrollTo('partner-form'); mobileMenuOpen=false" class="block nav-link w-full text-left">Заявка</a>
+          <div class="border-t border-border pt-3 mt-3">
+            <a href="https://lk.r33.ru" class="block nav-link w-full text-left"><i class="ri-user-3-line mr-2"></i>Войти в CRM</a>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+  <!-- CRM Error Banner -->
+  <div x-show="crmError" x-transition.opacity.duration.300ms class="bg-red-900/40 border-b border-red-700/30 text-red-300 text-sm text-center py-2">
+    <i class="ri-alert-line mr-1"></i>CRM временно недоступен. Попробуйте позже.
+  </div>
+</header>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- КЛИЕНТСКИЙ РЕЖИМ                                               -->
+<!-- ============================================================ -->
+<template x-if="mode === 'client'">
+<div>
+
+<!-- ====== HERO ====== -->
+<section id="hero" class="relative overflow-hidden pt-20 pb-24 sm:pt-28 sm:pb-32">
+  <div class="blob w-[500px] h-[500px] bg-blue-500/20 -top-40 -left-40"></div>
+  <div class="blob w-[400px] h-[400px] bg-purple-500/20 -bottom-40 -right-40"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    <div class="max-w-3xl mx-auto text-center">
+      <div class="eye-icon justify-center mb-6">
+        <span class="w-8 h-px bg-fg-muted"></span>
+        ВСЯ РЕКЛАМА 33 РЕГИОНА В ОДНОМ ОКНЕ
+        <span class="w-8 h-px bg-fg-muted"></span>
+      </div>
+      <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-6">
+        <span class="gradient-text">Единое окно</span><br>
+        для всей рекламы<br>
+        <span class="text-fg">Владимирской области</span>
+      </h1>
+      <p class="text-lg sm:text-xl text-fg-muted max-w-2xl mx-auto mb-10 leading-relaxed">
+        Агрегатор всех рекламных поверхностей 33 региона — сайты, наружка, ТВ, СМИ, паблики, блогеры.
+        Не ищете 10 подрядчиков. Заходите к нам.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="#calculator" @click.prevent="scrollTo('calculator')" class="btn-primary text-base px-8 py-4 shadow-xl shadow-accent/20">
+          Рассчитать стоимость
+          <i class="ri-arrow-right-line"></i>
+        </a>
+        <a href="#portfolio" @click.prevent="scrollTo('portfolio')" class="btn-ghost text-base px-8 py-4">
+          Наши проекты
+          <i class="ri-arrow-down-line"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Task-Solution Grid -->
+    <div class="mt-24 max-w-5xl mx-auto">
+      <div class="text-center mb-8">
+        <div class="eye-icon justify-center mb-4">
+          <span class="w-8 h-px bg-fg-muted"></span>
+          ВАША ЗАДАЧА — НАШЕ РЕШЕНИЕ
+          <span class="w-8 h-px bg-fg-muted"></span>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <template x-for="row in taskSolution" :key="row.task">
+          <div class="card p-5 cursor-pointer group" @click="scrollTo(row.anchor)">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0 group-hover:bg-accent/20 transition-colors">
+                <i :class="row.icon" class="text-accent text-lg"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="text-xs text-fg-soft uppercase tracking-wider mb-0.5">Задача</div>
+                <div class="font-semibold text-sm leading-snug" x-text="row.task"></div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== УСЛУГИ ====== -->
+<section id="services" class="py-20 sm:py-28">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <div class="eye-icon justify-center mb-4">
+        <span class="w-8 h-px bg-fg-muted"></span>
+        ЧТО МЫ ДЕЛАЕМ
+        <span class="w-8 h-px bg-fg-muted"></span>
+      </div>
+      <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">Наши услуги</h2>
+      <p class="text-lg text-fg-muted max-w-2xl mx-auto">
+        Мы — агрегатор всех рекламных поверхностей 33 региона + всех площадок в интернете.
+        Паблики, каналы, блогеры, медийные личности Владимирской области.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
+      <template x-for="(svc, idx) in services" :key="svc.id">
+        <div class="card overflow-hidden group">
+          <div class="p-6 cursor-pointer" @click="toggleService(idx)">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent/20 to-accent2/20 flex items-center justify-center">
+                <i :class="svc.icon" class="text-2xl text-accent"></i>
+              </div>
+              <div class="flex-1">
+                <h3 class="font-semibold text-base" x-text="svc.title"></h3>
+                <div class="text-sm text-fg-soft" x-text="'от ' + svc.priceRange.min.toLocaleString() + ' ₽'"></div>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-panel flex items-center justify-center transition-transform duration-200" :class="{'rotate-180': openService === idx}">
+                <i class="ri-arrow-down-s-line text-fg-muted"></i>
+              </div>
+            </div>
+          </div>
+          <div x-show="openService === idx" x-transition:enter="transition-all duration-300 ease-out" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" class="border-t border-border">
+            <div class="p-6 space-y-3 text-sm text-fg-muted leading-relaxed">
+              <p x-text="svc.description"></p>
+              <div class="flex items-center gap-2 text-fg font-medium pt-1">
+                <i class="ri-money-ruble-circle-line text-accent"></i>
+                <span x-text="svc.priceRange.min.toLocaleString() + ' — ' + svc.priceRange.max.toLocaleString() + ' ₽'"></span>
+              </div>
+              <div x-show="svc.examples.length">
+                <div class="text-xs uppercase tracking-wider text-fg-soft mt-3 mb-1.5">Пример:</div>
+                <div class="bg-panel rounded-lg p-3 text-fg text-xs" x-text="svc.examples[0]"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+</section>
+
+<!-- ====== ПРОЕКТЫ ====== -->
+<section id="portfolio" class="py-20 sm:py-28 bg-panel/50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <div class="eye-icon justify-center mb-4">
+        <span class="w-8 h-px bg-fg-muted"></span>
+        ПОРТФОЛИО
+        <span class="w-8 h-px bg-fg-muted"></span>
+      </div>
+      <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">Наши проекты</h2>
+      <p class="text-lg text-fg-muted max-w-2xl mx-auto">Реальные кейсы. Реальные результаты.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      <div class="card overflow-hidden group">
+        <div class="h-48 bg-gradient-to-br from-blue-600/20 via-blue-500/10 to-purple-600/20 flex items-center justify-center">
+          <i class="ri-globe-line text-6xl text-accent/40 group-hover:text-accent/60 transition-colors"></i>
+        </div>
+        <div class="p-6">
+          <div class="text-xs text-fg-soft uppercase tracking-wider mb-1">Веб-разработка</div>
+          <h3 class="font-bold text-lg mb-2">Смальта — редизайн</h3>
+          <p class="text-sm text-fg-muted leading-relaxed">Полный редизайн и миграция на WordPress. Рост трафика +40% за 3 месяца.</p>
+        </div>
+      </div>
+      <div class="card overflow-hidden group">
+        <div class="h-48 bg-gradient-to-br from-purple-600/20 via-pink-500/10 to-orange-600/20 flex items-center justify-center">
+          <i class="ri-megaphone-line text-6xl text-accent/40 group-hover:text-accent/60 transition-colors"></i>
+        </div>
+        <div class="p-6">
+          <div class="text-xs text-fg-soft uppercase tracking-wider mb-1">Наружная реклама</div>
+          <h3 class="font-bold text-lg mb-2">Торговый центр</h3>
+          <p class="text-sm text-fg-muted leading-relaxed">Размещение на 12 билбордах во Владимире и Муроме. Охват 150 000 человек.</p>
+        </div>
+      </div>
+      <div class="card overflow-hidden group">
+        <div class="h-48 bg-gradient-to-br from-pink-600/20 via-rose-500/10 to-red-600/20 flex items-center justify-center">
+          <i class="ri-megaphone-line text-6xl text-accent/40 group-hover:text-accent/60 transition-colors"></i>
+        </div>
+        <div class="p-6">
+          <div class="text-xs text-fg-soft uppercase tracking-wider mb-1">Медиакампания</div>
+          <h3 class="font-bold text-lg mb-2">33 регион</h3>
+          <p class="text-sm text-fg-muted leading-relaxed">ТВ-эфиры, публикации в СМИ, интеграции у блогеров. Общий охват 500 000+.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== КАЛЬКУЛЯТОР ====== -->
+<section id="calculator" class="py-20 sm:py-28">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-12">
+        <div class="eye-icon justify-center mb-4">
+          <span class="w-8 h-px bg-fg-muted"></span>
+          ПРИКИНУТЬ БЮДЖЕТ
+          <span class="w-8 h-px bg-fg-muted"></span>
+        </div>
+        <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">Калькулятор стоимости</h2>
+        <p class="text-lg text-fg-muted">Выберите услуги — получите предварительную смету. Базовая ставка: <span class="text-fg font-semibold">2 000 ₽/час</span></p>
+      </div>
+      <div class="card p-6 sm:p-8">
+        <div class="space-y-1 mb-8">
+          <template x-for="svc in services" :key="svc.id">
+            <label class="check-row rounded-xl">
+              <div class="flex items-center gap-3">
+                <input type="checkbox" x-model="selectedCalc" :value="svc.id"
+                  class="w-5 h-5 rounded-lg border-border text-accent focus:ring-accent/30 bg-surface accent-accent">
+                <span x-text="svc.title" class="font-medium text-sm"></span>
+              </div>
+              <span class="text-sm text-fg-soft" x-text="'от ' + svc.priceRange.min.toLocaleString() + ' ₽'"></span>
+            </label>
+          </template>
+        </div>
+        <div class="border-t border-border pt-6">
+          <div class="flex items-end justify-between mb-6">
+            <div>
+              <div class="text-sm text-fg-soft mb-1">Предварительная смета</div>
+              <div class="text-sm text-fg-muted">Минимальная — максимальная</div>
+            </div>
+            <div class="text-right">
+              <span class="text-3xl sm:text-4xl font-extrabold gradient-text" x-text="estimateText"></span>
+            </div>
+          </div>
+          <button @click="submitEstimate"
+            :disabled="selectedCalc.length === 0"
+            :class="selectedCalc.length === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:opacity-90 hover:-translate-y-0.5'"
+            class="btn-primary w-full justify-center text-base py-4 shadow-xl shadow-accent/20 transition-all duration-200">
+            <i class="ri-send-plane-line"></i>
+            Отправить заявку
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== СТАТИСТИКА + КОМАНДА ====== -->
+<section class="py-20 sm:py-28 bg-panel/50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-20">
+      <div class="card p-8 text-center">
+        <div class="text-4xl sm:text-5xl font-extrabold gradient-text mb-1">19</div>
+        <div class="text-sm text-fg-muted">лет на рынке</div>
+      </div>
+      <div class="card p-8 text-center">
+        <div class="text-4xl sm:text-5xl font-extrabold gradient-text mb-1">240+</div>
+        <div class="text-sm text-fg-muted">партнёров</div>
+      </div>
+      <div class="card p-8 text-center">
+        <div class="text-4xl sm:text-5xl font-extrabold gradient-text mb-1">689</div>
+        <div class="text-sm text-fg-muted">проектов</div>
+      </div>
+      <div class="card p-8 text-center">
+        <div class="text-4xl sm:text-5xl font-extrabold gradient-text mb-1">99.9%</div>
+        <div class="text-sm text-fg-muted">аптайм</div>
+      </div>
+    </div>
+    <div class="text-center mb-12">
+      <div class="eye-icon justify-center mb-4">
+        <span class="w-8 h-px bg-fg-muted"></span>
+        КОМАНДА
+        <span class="w-8 h-px bg-fg-muted"></span>
+      </div>
+      <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">Кто делает R33</h2>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-14">
+      <div class="card p-8 text-center">
+        <div class="w-20 h-20 rounded-full bg-accent/20 flex items-center justify-center text-3xl text-accent mx-auto mb-4"><i class="ri-user-line"></i></div>
+        <h4 class="text-xl font-bold text-fg">Алексей С.</h4>
+        <div class="text-sm font-semibold text-accent mb-3">Основатель / Архитектор</div>
+        <p class="text-xs text-fg-soft">Стратегия, архитектура систем, связи между бизнесом и технологиями</p>
+      </div>
+      <div class="card p-8 text-center">
+        <div class="w-20 h-20 rounded-full bg-accent3/20 flex items-center justify-center text-3xl text-accent3 mx-auto mb-4"><i class="ri-user-line"></i></div>
+        <h4 class="text-xl font-bold text-fg">Екатерина М.</h4>
+        <div class="text-sm font-semibold text-accent3 mb-3">Медиа-байер</div>
+        <p class="text-xs text-fg-soft">Медиапланирование, закуп рекламы, работа с площадками</p>
+      </div>
+      <div class="card p-8 text-center">
+        <div class="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center text-3xl text-emerald-400 mx-auto mb-4"><i class="ri-user-line"></i></div>
+        <h4 class="text-xl font-bold text-fg">Дмитрий К.</h4>
+        <div class="text-sm font-semibold text-emerald-400 mb-3">Продакт-менеджер</div>
+        <p class="text-xs text-fg-soft">Координация проектов, контроль сроков, работа с партнёрами</p>
+      </div>
+      <div class="card p-8 text-center !border-accent2/50">
+        <div class="w-20 h-20 rounded-full bg-accent2/20 flex items-center justify-center text-3xl text-accent2 mx-auto mb-4 animate-pulse"><i class="ri-robot-2-line"></i></div>
+        <h4 class="text-xl font-bold text-fg">ИИ Игорь</h4>
+        <div class="text-sm font-semibold text-accent2 mb-3">ИИ-Директор</div>
+        <p class="text-xs text-fg-soft">Автоподбор площадок, формирование медиапланов, аналитика 24/7</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== КОНТАКТЫ ====== -->
+<section id="contacts" class="py-20 sm:py-28">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div class="eye-icon justify-center mb-4">
+      <span class="w-8 h-px bg-fg-muted"></span>
+        СВЯЗАТЬСЯ
+      <span class="w-8 h-px bg-fg-muted"></span>
+    </div>
+    <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">Готовы обсудить проект?</h2>
+    <p class="text-lg text-fg-muted mb-10 max-w-xl mx-auto">Звоните, пишите — мы на связи.</p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <a href="tel:+74922494222" class="card p-5 flex items-center gap-4 hover:border-accent transition-colors min-w-[240px]">
+        <div class="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+          <i class="ri-phone-line text-accent text-xl"></i>
+        </div>
+        <div class="text-left">
+          <div class="font-semibold">+7 (4922) 49-42-22</div>
+          <div class="text-xs text-fg-soft">городской, Владимир</div>
+        </div>
+      </a>
+      <a href="tel:+79050551100" class="card p-5 flex items-center gap-4 hover:border-accent transition-colors min-w-[240px]">
+        <div class="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+          <i class="ri-smartphone-line text-accent text-xl"></i>
+        </div>
+        <div class="text-left">
+          <div class="font-semibold">+7 (905) 055-11-00</div>
+          <div class="text-xs text-fg-soft">мобильный</div>
+        </div>
+      </a>
+      <a href="https://vk.com/r33_ru" target="_blank" rel="noopener" class="card p-5 flex items-center gap-4 hover:border-accent transition-colors min-w-[240px]">
+        <div class="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+          <i class="ri-vk-line text-accent text-xl"></i>
+        </div>
+        <div class="text-left">
+          <div class="font-semibold">vk.com/r33_ru</div>
+          <div class="text-xs text-fg-soft">ВКонтакте</div>
+        </div>
+      </a>
+      <a href="mailto:info@r33.ru" class="card p-5 flex items-center gap-4 hover:border-accent transition-colors min-w-[240px]">
+        <div class="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+          <i class="ri-mail-line text-accent text-xl"></i>
+        </div>
+        <div class="text-left">
+          <div class="font-semibold">info@r33.ru</div>
+          <div class="text-xs text-fg-soft">email</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+</div>
+</template>
+
+<!-- ============================================================ -->
+<!-- КАРЬЕРНЫЙ РЕЖИМ                                                -->
+<!-- ============================================================ -->
+<template x-if="mode === 'career'">
+<div>
+
+<!-- ====== CAREER HERO ====== -->
+<section id="career-hero" class="relative overflow-hidden pt-20 pb-24 sm:pt-28 sm:pb-32">
+  <div class="blob w-[500px] h-[500px] bg-purple-500/20 -top-40 -right-40"></div>
+  <div class="blob w-[400px] h-[400px] bg-pink-500/20 -bottom-40 -left-40"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    <div class="max-w-3xl mx-auto text-center">
+      <div class="eye-icon justify-center mb-6">
+        <span class="w-8 h-px bg-fg-muted"></span>
+        НЕ ФРАНШИЗА. КАРЬЕРА.
+        <span class="w-8 h-px bg-fg-muted"></span>
+      </div>
+      <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-6">
+        Стань партнёром<br>
+        <span class="gradient-text">33 региона</span>
+      </h1>
+      <p class="text-lg sm:text-xl text-fg-muted max-w-2xl mx-auto mb-10 leading-relaxed">
+        Мы даём карьеру. Говорим что делать → ставим задачи → доводим до результата → платим.
+      </p>
+      <a href="#partner-form" @click.prevent="scrollTo('partner-form')" class="btn-primary text-base px-8 py-4 shadow-xl shadow-accent/20">
+        Стать партнёром
+        <i class="ri-arrow-right-line"></i>
+      </a>
+    </div>
+
+    <!-- Target Audience -->
+    <div class="mt-20 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
+      <div class="card p-5 text-center group">
+        <div class="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-accent/20 transition-colors">
+          <i class="ri-user-line text-accent text-xl"></i>
+        </div>
+        <div class="font-semibold text-sm">Агенты</div>
+        <div class="text-xs text-fg-soft mt-0.5">во всех городах</div>
+      </div>
+      <div class="card p-5 text-center group">
+        <div class="w-12 h-12 rounded-2xl bg-accent2/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-accent2/20 transition-colors">
+          <i class="ri-building-line text-accent2 text-xl"></i>
+        </div>
+        <div class="font-semibold text-sm">Агентства</div>
+        <div class="text-xs text-fg-soft mt-0.5">веб / реклама</div>
+      </div>
+      <div class="card p-5 text-center group">
+        <div class="w-12 h-12 rounded-2xl bg-accent3/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-accent3/20 transition-colors">
+          <i class="ri-team-line text-accent3 text-xl"></i>
+        </div>
+        <div class="font-semibold text-sm">Продажники</div>
+        <div class="text-xs text-fg-soft mt-0.5">отделы продаж</div>
+      </div>
+      <div class="card p-5 text-center group">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-emerald-500/20 transition-colors">
+          <i class="ri-palette-line text-emerald-400 text-xl"></i>
+        </div>
+        <div class="font-semibold text-sm">Мастера</div>
+        <div class="text-xs text-fg-soft mt-0.5">веб / печать / дизайн</div>
+      </div>
+    </div>
+
+    <!-- 5 Values + 6th "Your Offer" -->
+    <div class="mt-20 max-w-4xl mx-auto">
+      <div class="eye-icon justify-center mb-8">
+        <span class="w-8 h-px bg-fg-muted"></span>
+        ЧТО МЫ ДАЁМ
+        <span class="w-8 h-px bg-fg-muted"></span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <template x-for="(v, i) in careerValues" :key="i">
+          <div class="card p-5 flex items-start gap-4">
+            <div class="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0 text-sm font-bold text-accent" x-text="i+1"></div>
+            <div>
+              <div class="font-semibold text-sm mb-1" x-text="v.title"></div>
+              <div class="text-sm text-fg-muted leading-relaxed" x-text="v.desc"></div>
+            </div>
+          </div>
+        </template>
+        <!-- 6th card: Ваше предложение -->
+        <div class="card p-5 flex items-start gap-4 border-2 border-dashed border-accent/40 bg-accent/5 group hover:border-accent transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0 text-sm font-bold text-accent">+</div>
+          <div>
+            <div class="font-semibold text-sm mb-1">Ваше предложение</div>
+            <div class="text-sm text-fg-muted leading-relaxed">Мы открыты к сотрудничеству. Предложите свой формат — рассмотрим любую идею.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two Paths -->
+    <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+      <div class="card p-8 border-accent/30 group">
+        <div class="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
+          <i class="ri-medal-line text-accent text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-2">Старший по городу</h3>
+        <p class="text-sm text-fg-muted leading-relaxed">Возьмите город под контроль. Соберите команду. Управляйте всеми проектами внутри R33.</p>
+      </div>
+      <div class="card p-8 group">
+        <div class="w-14 h-14 rounded-2xl bg-accent2/10 flex items-center justify-center mb-4 group-hover:bg-accent2/20 transition-colors">
+          <i class="ri-contract-line text-accent2 text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-2">Площадка / Партнёр / Агент</h3>
+        <p class="text-sm text-fg-muted leading-relaxed">Работайте с нами. Используйте свои каналы + получайте наши. Без изменения вашей логики.</p>
+      </div>
+    </div>
+
+    <!-- Entry cost -->
+    <div class="mt-12 max-w-lg mx-auto">
+      <div class="card p-8 text-center border-accent/30">
+        <p class="text-sm text-fg-muted mb-3">Старт с минимальными вложениями</p>
+        <p class="text-5xl font-extrabold gradient-text mb-4">от 100 000 ₽</p>
+        <div class="grid grid-cols-3 gap-3 text-sm mb-3">
+          <div class="bg-panel rounded-xl p-3">
+            <div class="text-lg font-bold text-accent">40%</div>
+            <div class="text-xs text-fg-muted">инфраструктура</div>
+          </div>
+          <div class="bg-panel rounded-xl p-3">
+            <div class="text-lg font-bold text-accent2">40%</div>
+            <div class="text-xs text-fg-muted">реклама в городе</div>
+          </div>
+          <div class="bg-panel rounded-xl p-3">
+            <div class="text-lg font-bold text-green-400">20%</div>
+            <div class="text-xs text-fg-muted">агенту</div>
+          </div>
+        </div>
+        <div class="text-xs text-fg-soft">Всё честно и прозрачно. 40 000 ₽ — инфраструктура, 40 000 ₽ — реклама в целевом городе, 20 000 ₽ — вознаграждение агенту.</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- ====== КАРТА (всегда в DOM, только скрыта) ====== -->
+<section id="city-map" x-show="mode === 'career'" class="py-20 sm:py-28 bg-panel/50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <div class="eye-icon justify-center mb-4">
+        <span class="w-8 h-px bg-fg-muted"></span>
+        КАРТА 33 РЕГИОНА
+        <span class="w-8 h-px bg-fg-muted"></span>
+      </div>
+      <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">Выберите город</h2>
+      <p class="text-lg text-fg-muted">Статус и цена входа зависят от города</p>
+    </div>
+    <div class="card p-2 sm:p-3 max-w-4xl mx-auto">
+      <div id="leaflet-map" class="w-full h-[400px] sm:h-[500px] rounded-xl overflow-hidden z-0"></div>
+      <div x-show="selectedCity" x-transition.opacity.duration.300ms class="mt-4 p-5 rounded-xl border" :class="selectedCity?.status === 'available' ? 'border-green-500/30 bg-green-900/10' : selectedCity?.status === 'hub' ? 'border-purple-500/30 bg-purple-900/10' : 'border-blue-500/30 bg-blue-900/10'">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="font-bold text-xl" x-text="selectedCity?.name"></span>
+          <span class="text-xs px-3 py-1 rounded-full font-medium" :class="selectedCity?.status === 'available' ? 'bg-green-500/20 text-green-400' : selectedCity?.status === 'hub' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'" x-text="selectedCity?.statusLabel"></span>
+        </div>
+        <template x-if="selectedCity?.status === 'available'">
+          <div class="flex items-center gap-4 flex-wrap">
+            <p class="text-sm text-fg-muted">Вход: <strong class="text-fg text-lg" x-text="selectedCity?.entryPrice?.toLocaleString() + ' ₽'"></strong></p>
+            <button @click="openPartnerForm" class="btn-primary text-sm">Стать партнёром</button>
+          </div>
+        </template>
+        <template x-if="selectedCity?.status !== 'available'">
+          <p class="text-sm text-fg-muted">Город уже занят. Свяжитесь с нами для других городов.</p>
+        </template>
+      </div>
+    </div>
+  </div>
+</section>
+
+<template x-if="mode === 'career'">
+<div>
+
+<!-- ====== РОЛИ В СИСТЕМЕ ====== -->
+<section id="payouts" class="py-20 lg:py-32 px-6 bg-panel/50">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-16">
+      <span class="eyebrow text-accent mb-4">— для кого мы работаем</span>
+      <h2 class="text-3xl lg:text-4xl font-extrabold mt-4 mb-4">Одна платформа — четыре роли</h2>
+      <p class="text-fg-muted max-w-2xl mx-auto">Каждый участник системы получает свою выгоду. Прозрачное распределение, единый кабинет, честные правила.</p>
+    </div>
+    <div class="grid lg:grid-cols-12 gap-5">
+      <!-- Рекламодатели -->
+      <div class="lg:col-span-5 lg:row-span-2 card p-8 lg:p-10 relative overflow-hidden border-none" style="background: linear-gradient(135deg, #3b82f6, #7c3aed)">
+        <div class="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/10 blur-[40px]"></div>
+        <div class="relative text-white">
+          <div class="flex items-center justify-between mb-6">
+            <span class="text-sm font-bold uppercase tracking-wider text-white/80">— рекламодатели</span>
+            <i class="ri-megaphone-line text-5xl opacity-30"></i>
+          </div>
+          <h3 class="text-3xl lg:text-4xl font-bold mb-4 leading-tight">Прямые лиды</h3>
+          <p class="text-lg mb-8 text-white/90">У вас есть задача — нужен сайт, наружка, клиенты, трафик. Вы обращаетесь в одно окно, а система <strong>сама подбирает</strong> исполнителей и формирует медиаплан.</p>
+          <div class="grid grid-cols-3 gap-4">
+            <div><div class="text-3xl font-bold">1</div><div class="text-xs uppercase tracking-wider text-white/70">окно</div></div>
+            <div><div class="text-3xl font-bold">20+</div><div class="text-xs uppercase tracking-wider text-white/70">услуг</div></div>
+            <div><div class="text-3xl font-bold">24ч</div><div class="text-xs uppercase tracking-wider text-white/70">аудит</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Площадки -->
+      <div class="lg:col-span-7 card p-7 flex items-start gap-6">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl text-white shrink-0 bg-emerald-600"><i class="ri-store-3-line"></i></div>
+        <div class="flex-1">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-bold uppercase tracking-wider text-emerald-400">— площадки</span>
+            <span class="px-3 py-1 text-xs font-bold rounded-md bg-emerald-500/10 text-emerald-400">30% ДОХОДА</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-2 text-fg">Монетизируйте инвентарь</h3>
+          <p class="text-fg-muted">Владельцы поверхностей, пабликов, экранов — загружайте свои площади в систему. Агенты найдут клиентов, мы обеспечим оплату и маркировку ОРД. Вы получаете <strong class="text-fg">30%</strong> с каждого размещения.</p>
+        </div>
+      </div>
+      <!-- Агенты -->
+      <div class="lg:col-span-7 card p-7 flex items-start gap-6 bg-surface">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl text-white shrink-0 bg-amber-600"><i class="ri-walk-line"></i></div>
+        <div class="flex-1">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-bold uppercase tracking-wider text-amber-400">— агенты</span>
+            <span class="px-3 py-1 text-xs font-bold rounded-md bg-amber-500/10 text-amber-400">20% ДОХОДА</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-2 text-fg">Ищите клиентов, закрывайте сделки</h3>
+          <p class="text-fg-muted">Люди в полях — менеджеры по продажам. Находите рекламодателей, договариваетесь, монтируете рекламу и отчитываетесь через мобильную CRM. Ваша доля — <strong class="text-fg">20%</strong> от сделки. Если вы ещё и площадка — доли суммируются.</p>
+        </div>
+      </div>
+      <!-- Партнёры -->
+      <div class="lg:col-span-6 card p-7 border-dashed border-2">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-sm font-bold uppercase tracking-wider text-accent3">— партнёры</span>
+          <i class="ri-tools-fill text-3xl text-accent3"></i>
+        </div>
+        <h3 class="text-2xl font-bold mb-3 text-fg">Производственники</h3>
+        <p class="mb-5 text-fg-muted">Тестировщики, печатники, программисты, дизайнеры, маркировщики ОРД — вы делаете продукт. Мы даём поток заказов.</p>
+        <div class="flex items-center gap-4 pt-5 border-t border-dashed border-border">
+          <div class="text-3xl font-bold gradient-text">30%</div>
+          <div class="text-sm text-fg-soft">вашей выплаты<br>с каждого заказа</div>
+        </div>
+      </div>
+      <!-- Агентство -->
+      <div class="lg:col-span-6 card p-7 relative overflow-hidden border-none" style="background: linear-gradient(135deg, #10b981, #059669)">
+        <div class="text-white">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-sm font-bold uppercase tracking-wider text-white/80">— агентство R33</span>
+            <i class="ri-shield-check-fill text-3xl opacity-50"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-3">Мы — инфраструктура</h3>
+          <p class="mb-5 text-white/90">CRM, бренд, юридика, налоги, техподдержка. Наша выплата — 20%. Мы обеспечиваем работу всей сети и берём на себя все обязательные расходы.</p>
+          <div class="grid grid-cols-3 gap-3">
+            <div class="rounded-xl p-3 bg-white/15"><div class="text-2xl font-bold">CRM</div><div class="text-xs text-white/80">платформа</div></div>
+            <div class="rounded-xl p-3 bg-white/15"><div class="text-2xl font-bold">ОРД</div><div class="text-xs text-white/80">маркировка</div></div>
+            <div class="rounded-xl p-3 bg-white/15"><div class="text-2xl font-bold">24/7</div><div class="text-xs text-white/80">поддержка</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== ФОРМА ====== -->
+<section id="partner-form" class="py-20 sm:py-28 bg-panel/50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-lg mx-auto">
+      <div class="text-center mb-10">
+        <div class="eye-icon justify-center mb-4">
+          <span class="w-8 h-px bg-fg-muted"></span>
+          ОСТАВИТЬ ЗАЯВКУ
+          <span class="w-8 h-px bg-fg-muted"></span>
+        </div>
+        <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">Стать партнёром</h2>
+        <p class="text-lg text-fg-muted">Заполните форму — мы свяжемся с вами</p>
+      </div>
+      <div class="card p-6 sm:p-8">
+        <form @submit.prevent="submitPartnerForm">
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Имя <span class="text-accent">*</span></label>
+              <input type="text" x-model="partnerForm.name" required
+                class="w-full px-4 py-3 rounded-xl bg-surface border border-border text-fg placeholder-fg-soft focus:border-accent focus:ring-1 focus:ring-accent/30 outline-none transition-colors"
+                placeholder="Ваше имя">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Телефон <span class="text-accent">*</span></label>
+              <input type="tel" x-model="partnerForm.phone" required
+                class="w-full px-4 py-3 rounded-xl bg-surface border border-border text-fg placeholder-fg-soft focus:border-accent focus:ring-1 focus:ring-accent/30 outline-none transition-colors"
+                placeholder="+7 (___) ___-__-__">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Email</label>
+              <input type="email" x-model="partnerForm.email"
+                class="w-full px-4 py-3 rounded-xl bg-surface border border-border text-fg placeholder-fg-soft focus:border-accent focus:ring-1 focus:ring-accent/30 outline-none transition-colors"
+                placeholder="email@example.ru">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Город <span class="text-accent">*</span></label>
+              <select x-model="partnerForm.city" required
+                class="w-full px-4 py-3 rounded-xl bg-surface border border-border text-fg focus:border-accent focus:ring-1 focus:ring-accent/30 outline-none transition-colors">
+                <option value="" class="bg-surface">Выберите город</option>
+                <template x-for="city in cities" :key="city.id">
+                  <option :value="city.name" x-text="city.name" class="bg-surface"></option>
+                </template>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1.5">Сообщение</label>
+              <textarea x-model="partnerForm.message" rows="3"
+                class="w-full px-4 py-3 rounded-xl bg-surface border border-border text-fg placeholder-fg-soft focus:border-accent focus:ring-1 focus:ring-accent/30 outline-none transition-colors"
+                placeholder="Расскажите о себе"></textarea>
+            </div>
+            <button type="submit"
+              class="btn-primary w-full justify-center text-base py-4 shadow-xl shadow-accent/20">
+              <i class="ri-send-plane-line"></i>
+              Отправить заявку
+            </button>
+          </div>
+        </form>
+        <div x-show="partnerFormSubmitted" x-transition.opacity.duration.300ms class="mt-6 p-4 rounded-xl bg-green-900/20 border border-green-500/30 text-green-400 text-sm text-center">
+          <i class="ri-checkbox-circle-line mr-1"></i> Спасибо! Мы свяжемся с вами в ближайшее время.
+        </div>
+        <div x-show="partnerFormError" x-transition.opacity.duration.300ms class="mt-6 p-4 rounded-xl bg-red-900/20 border border-red-500/30 text-red-400 text-sm text-center">
+          <i class="ri-alert-line mr-1"></i> Ошибка отправки. Попробуйте позже или напишите на info@r33.ru
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+</template>
+
+</main>
+
+<!-- ====== ФУТЕР ====== -->
+<footer class="border-t border-border bg-panel/30">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div>
+        <div class="flex items-center gap-2.5 mb-4">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-accent2 flex items-center justify-center text-white font-extrabold text-sm">R</div>
+          <span class="text-lg font-bold">R33<span class="text-fg-muted font-normal">.ru</span></span>
+        </div>
+        <p class="text-sm text-fg-muted leading-relaxed">Агрегатор рекламных поверхностей 33 региона. Работаем по всей Владимирской области.</p>
+        <p class="text-xs text-fg-soft mt-3 leading-relaxed">ИНН: 333411310227; ОГРН: 307333419200050; св.33 №001423792 от 11.07.2007г.</p>
+        <p class="text-xs text-fg-soft mt-2 leading-relaxed">МОСКОВСКИЙ ФИЛИАЛ АО КБ "МОДУЛЬБАНК" г Москва<br>
+        Р/с: 40802810770010061466<br>
+        К/с: 30101810645250000092<br>
+        БИК: 044525092<br>
+        Получатель: ИП Алексеев А.С.</p>
+      </div>
+      <div>
+        <h3 class="font-bold text-sm uppercase tracking-wider mb-4 text-fg">Юридические документы</h3>
+        <ul class="space-y-2 text-sm">
+          <li><button @click="openLegal('offer')" class="text-fg-muted hover:text-fg transition-colors">Публичная оферта</button></li>
+          <li><button @click="openLegal('user-agreement')" class="text-fg-muted hover:text-fg transition-colors">Пользовательское соглашение</button></li>
+          <li><button @click="openLegal('privacy-policy')" class="text-fg-muted hover:text-fg transition-colors">Политика конфиденциальности</button></li>
+          <li><button @click="openLegal('consent-pd')" class="text-fg-muted hover:text-fg transition-colors">Согласие на обработку ПДн</button></li>
+          <li><button @click="openLegal('cookie-policy')" class="text-fg-muted hover:text-fg transition-colors">Политика cookie</button></li>
+          <li><button @click="openLegal('partner-agreement')" class="text-fg-muted hover:text-fg transition-colors">Партнёрское соглашение</button></li>
+          <li><button @click="openLegal('sop-sla')" class="text-fg-muted hover:text-fg transition-colors">Регламент (SOP + SLA)</button></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-bold text-sm uppercase tracking-wider mb-4 text-fg">Контакты</h3>
+        <div class="space-y-3 text-sm">
+          <div class="text-fg-muted">
+            <div class="font-semibold text-fg mb-1">г. Владимир, ул. Ставровская, 1</div>
+            <a href="tel:+74922494222" class="flex items-center gap-3 hover:text-fg transition-colors">
+              <i class="ri-phone-line text-accent"></i> +7 (4922) 49-42-22
+            </a>
+          </div>
+          <div class="text-fg-muted">
+            <div class="font-semibold text-fg mb-1">г. Владимир, ул. Мира, 76</div>
+            <a href="tel:+79050551100" class="flex items-center gap-3 hover:text-fg transition-colors">
+              <i class="ri-smartphone-line text-accent"></i> +7 (905) 055-11-00
+            </a>
+          </div>
+          <a href="https://vk.com/r33_ru" target="_blank" rel="noopener" class="flex items-center gap-3 text-fg-muted hover:text-fg transition-colors">
+            <i class="ri-vk-line text-accent"></i> vk.com/r33_ru
+          </a>
+          <a href="mailto:info@r33.ru" class="flex items-center gap-3 text-fg-muted hover:text-fg transition-colors">
+            <i class="ri-mail-line text-accent"></i> info@r33.ru
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-border mt-10 pt-8 text-center text-sm text-fg-soft leading-relaxed">
+      © 2026 R33.RU — Все права защищены
+    </div>
+  </div>
+</footer>
+
+<!-- ====== LEGAL OVERLAY ====== -->
+<div x-show="legalOpen" x-transition.opacity.duration.200ms class="fixed inset-0 z-[60] flex items-center justify-center p-4" style="background: rgba(0,0,0,.85);">
+  <div x-show="legalOpen" x-transition.scale.origin.center.duration.200ms class="bg-panel border border-border rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8 relative">
+    <button @click="legalOpen = false" class="absolute top-4 right-4 w-10 h-10 rounded-xl bg-surface border border-border flex items-center justify-center text-fg-muted hover:text-fg transition-colors">
+      <i class="ri-close-line text-xl"></i>
+    </button>
+    <div x-show="legalLoading" class="text-center py-12"><i class="ri-loader-4-line animate-spin text-3xl text-accent"></i></div>
+    <div x-show="legalError" class="text-center py-12 text-red-400"><i class="ri-alert-line text-3xl mb-2"></i><br>Документ временно недоступен. Пожалуйста, попробуйте позже.</div>
+    <div x-html="legalContent" x-show="!legalLoading && !legalError"></div>
+  </div>
+</div>
+
+<script>
+function app() {
+  return {
+    mode: 'client',
+    activeSection: 'hero',
+    crmError: false,
+    openService: null,
+    selectedCalc: [],
+    selectedCity: null,
+    legalOpen: false,
+    legalLoading: false,
+    legalContent: '',
+    legalError: false,
+    partnerForm: { name: '', phone: '', email: '', city: '', message: '' },
+    partnerFormSubmitted: false,
+    partnerFormError: false,
+    mobileMenuOpen: false,
+
+    taskSolution: [
+      { task: 'Сайт под ключ', solution: 'Разработка и запуск', icon: 'ri-globe-line', anchor: 'services' },
+      { task: 'Медийные охваты', solution: 'Таргетированная реклама', icon: 'ri-eye-line', anchor: 'services' },
+      { task: 'Эфиры на ТВ', solution: 'Размещение на телеканалах', icon: 'ri-tv-line', anchor: 'services' },
+      { task: 'Публикации в СМИ', solution: 'Пресс-размещение', icon: 'ri-news-line', anchor: 'services' },
+      { task: 'Наружная реклама', solution: 'Билборды, автобусы, скамейки', icon: 'ri-megaphone-line', anchor: 'services' },
+      { task: 'Мерч (проиводство)', solution: 'Печать и производство', icon: 'ri-shirt-line', anchor: 'services' },
+      { task: 'Реклама в пабликах', solution: 'Размещение в сообществах', icon: 'ri-group-line', anchor: 'services' },
+      { task: 'Блогеры (коллабы)', solution: 'Лидеры мнений 33 региона', icon: 'ri-star-line', anchor: 'services' },
+    ],
+
+    services: [
+      { id: 'web', title: 'Веб-разработка', icon: 'ri-code-line', priceRange: { min: 30000, max: 150000 }, description: 'Сайты под ключ: от лендинга до интернет-магазина. WordPress, Tilda, кастомная разработка.', examples: ['Разработка сайта «Смальта»'] },
+      { id: 'traffic', title: 'Трафик и медийка', icon: 'ri-line-chart-line', priceRange: { min: 15000, max: 200000 }, description: 'Яндекс.Директ, VK Реклама, таргет, SEO. Привлекаем целевую аудиторию.', examples: ['Медиакампания «33 регион»'] },
+      { id: 'outdoor', title: 'Наружная реклама', icon: 'ri-megaphone-line', priceRange: { min: 5000, max: 300000 }, description: 'Билборды, сити-форматы, автобусы, скамейки. Все поверхности 33 региона.', examples: ['Реклама на 12 билбордах'] },
+      { id: 'design', title: 'Дизайн и креатив', icon: 'ri-palette-line', priceRange: { min: 10000, max: 80000 }, description: 'Логотипы, фирменный стиль, макеты для наружки, презентации, мерч.', examples: ['Брендинг компании'] },
+      { id: 'ord', title: 'ОРД / ЕРИР', icon: 'ri-shield-check-line', priceRange: { min: 5000, max: 30000 }, description: 'Маркировка рекламы, передача в ЕРИР, полный документооборот.', examples: ['Настройка маркировки для агентства'] },
+      { id: 'automation', title: 'Автоматизация', icon: 'ri-robot-line', priceRange: { min: 20000, max: 120000 }, description: 'CRM, воронки продаж, чат-боты, скрипты. Автоматизируем рутину.', examples: ['CRM для отдела продаж'] },
+    ],
+
+    careerValues: [
+      { title: 'Продвижение вашего продукта', desc: 'Мы помогаем продвигать то, что вы делаете — свои услуги, товары, проекты.' },
+      { title: 'Готовые размещения', desc: 'Доступ к площадкам, пабликам и каналам 33 региона для ваших клиентов.' },
+      { title: 'Обновление скриптов', desc: 'Готовые скрипты работы для вебмастеров, печатников, дизайнеров.' },
+      { title: 'Работа для продажников', desc: 'Находите клиентов и ведите сделки — мы даём инструменты и выплаты.' },
+      { title: 'Рост и масштаб', desc: 'Возьмите город под контроль. Соберите команду. Работайте удалённо или офлайн.' },
+    ],
+
+    cities: [
+      { id: 'murom', name: 'Муром', lat: 55.5756, lng: 42.0381, status: 'open', statusLabel: 'Открыт', entryPrice: null },
+      { id: 'vladimir', name: 'Владимир', lat: 56.1365, lng: 40.3966, status: 'hub', statusLabel: 'Хаб', entryPrice: null },
+      { id: 'aleksandrov', name: 'Александров', lat: 56.3976, lng: 38.7170, status: 'available', statusLabel: 'Доступен', entryPrice: 200000 },
+      { id: 'vyazniki', name: 'Вязники', lat: 56.2458, lng: 42.1583, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'gorokhovets', name: 'Гороховец', lat: 56.2028, lng: 42.6933, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'gus', name: 'Гусь-Хрустальный', lat: 55.6208, lng: 40.6750, status: 'available', statusLabel: 'Доступен', entryPrice: 200000 },
+      { id: 'kameshkovo', name: 'Камешково', lat: 56.3494, lng: 40.9947, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'karabanovo', name: 'Карабаново', lat: 56.3111, lng: 38.7003, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'kirzhach', name: 'Киржач', lat: 56.1525, lng: 38.8603, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'kovrov', name: 'Ковров', lat: 56.3547, lng: 41.3156, status: 'available', statusLabel: 'Доступен', entryPrice: 200000 },
+      { id: 'kolchugino', name: 'Кольчугино', lat: 56.2973, lng: 39.3767, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'kosterevo', name: 'Костерёво', lat: 55.9333, lng: 39.6333, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'kurlovo', name: 'Курлово', lat: 55.4500, lng: 40.5833, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'lakinsk', name: 'Лакинск', lat: 56.0172, lng: 39.9494, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'melenki', name: 'Меленки', lat: 55.3333, lng: 41.6333, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'petushki', name: 'Петушки', lat: 55.9333, lng: 39.4667, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'pokrov', name: 'Покров', lat: 55.9167, lng: 39.1833, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'raduzhny', name: 'Радужный', lat: 56.0000, lng: 40.3333, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'sobinka', name: 'Собинка', lat: 55.9833, lng: 40.0167, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'trunino', name: 'Струнино', lat: 56.3750, lng: 38.5833, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'sudogda', name: 'Судогда', lat: 55.9667, lng: 40.8667, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'suzdal', name: 'Суздаль', lat: 56.4226, lng: 40.4468, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+      { id: 'yuryev', name: 'Юрьев-Польский', lat: 56.5000, lng: 39.6833, status: 'available', statusLabel: 'Доступен', entryPrice: 100000 },
+    ],
+
+    get estimateText() {
+      if (this.selectedCalc.length === 0) return '0 — 0 ₽'
+      let total = 0
+      this.selectedCalc.forEach(id => {
+        const svc = this.services.find(s => s.id === id)
+        if (svc) total += svc.priceRange.min
+      })
+      return total.toLocaleString() + ' — ' + (total * 2).toLocaleString() + ' ₽'
+    },
+
+    init() {
+      if (window.location.hash === '#career') { this.mode = 'career' }
+      if (window.location.hash === '#client') this.mode = 'client'
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {})
+      }
+      if (window.location.hash === '#career') {
+        setTimeout(() => this.initMap(), 500)
+      }
+    },
+
+    initMap() {
+      if (this._mapInitialized) return
+      const el = document.getElementById('leaflet-map')
+      if (!el) { return }
+      // Если элемент скрыт (display:none), Leaflet не может измерить размеры
+      if (el.offsetHeight === 0) { this._mapInitialized = false; return }
+      this._mapInitialized = true
+      this._pendingMap = false
+      const map = L.map('leaflet-map', {
+        center: [55.95, 40.4],
+        zoom: 8,
+        zoomControl: false,
+        scrollWheelZoom: false,
+        dragging: false,
+        doubleClickZoom: false,
+        attributionControl: false
+      })
+      this._mapInstance = map
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 18,
+        className: 'map-tiles'
+      }).addTo(map)
+
+      const self = this
+      this.cities.forEach(c => {
+        const color = c.status === 'open' ? '#3b82f6' : c.status === 'hub' ? '#7c3aed' : '#22c55e'
+        const marker = L.circleMarker([c.lat, c.lng], {
+          radius: 12,
+          fillColor: color,
+          color: '#fff',
+          weight: 2.5,
+          opacity: 1,
+          fillOpacity: 0.9
+        }).addTo(map)
+        marker.bindTooltip(c.name, { direction: 'top', offset: [0, -10] })
+        marker.on('click', () => self.selectCity(c))
+      })
+      map.invalidateSize()
+      setTimeout(() => map.invalidateSize(), 200)
+    },
+
+    switchMode(m) {
+      if (this.mode === 'career' && this._mapInstance) {
+        this._mapInstance.remove()
+        this._mapInstance = null
+        this._mapInitialized = false
+      }
+      this.mode = m
+      this.activeSection = m === 'client' ? 'hero' : 'career-hero'
+      window.location.hash = m === 'client' ? '#client' : '#career'
+      if (m === 'career') {
+        setTimeout(() => { this._mapInitialized = false; this.initMap() }, 500)
+      }
+    },
+
+    scrollTo(id) {
+      this.activeSection = id
+      const el = document.getElementById(id)
+      if (el) el.scrollIntoView({ behavior: 'smooth' })
+    },
+
+    toggleService(idx) {
+      this.openService = this.openService === idx ? null : idx
+    },
+
+    selectCity(city) {
+      this.selectedCity = city
+    },
+
+    openPartnerForm() {
+      this.mode = 'career'
+      setTimeout(() => this.scrollTo('partner-form'), 100)
+    },
+
+    submitPartnerForm() {
+      this.partnerFormSubmitted = false
+      this.partnerFormError = false
+      setTimeout(() => {
+        this.partnerFormSubmitted = true
+        this.partnerForm = { name: '', phone: '', email: '', city: '', message: '' }
+      }, 800)
+    },
+
+    submitEstimate() {
+      if (this.selectedCalc.length === 0) return
+      this.scrollTo('contacts')
+    },
+
+    async openLegal(docId) {
+      this.legalOpen = true
+      this.legalLoading = true
+      this.legalContent = ''
+      this.legalError = false
+      try {
+        const resp = await fetch('/static/legal/' + docId + '.html')
+        if (!resp.ok) throw new Error('Not found')
+        this.legalContent = await resp.text()
+      } catch(e) {
+        this.legalError = true
+      } finally {
+        this.legalLoading = false
+      }
+    },
+
+    crmClick() {
+      this.crmError = false
+      fetch('https://lk.r33.ru/', { mode: 'no-cors' }).catch(() => {
+        this.crmError = true
+        setTimeout(() => { this.crmError = false }, 5000)
+      })
+      window.open('https://lk.r33.ru', '_blank')
+    }
+  }
+}
+</script>
+
+<!-- Расписание работы -->
+<script>
+(function() {
+  var schedule = [
+    null,
+    [9*60, 19*60],
+    [9*60, 19*60],
+    [9*60, 19*60],
+    [9*60, 19*60],
+    [9*60, 19*60],
+    [10*60, 16*60]
+  ];
+  var dayNames = ['воскресенье', 'понедельник', 'вторник', 'среду', 'четверг', 'пятницу', 'субботу'];
+
+  function fmtTime(m) {
+    var h = Math.floor(m/60), min = m % 60;
+    return h + ':' + (min < 10 ? '0' : '') + min;
+  }
+
+  function getStatus() {
+    var now = new Date();
+    var msk = new Date(now.toLocaleString('en-US', {timeZone:'Europe/Moscow'}));
+    var day = msk.getDay();
+    var totalMin = msk.getHours()*60 + msk.getMinutes();
+    var today = schedule[day];
+    if (today && totalMin >= today[0] && totalMin < today[1]) {
+      var left = today[1] - totalMin;
+      return {state:'open', text:'онлайн · до закрытия ' + Math.floor(left/60) + ' ч ' + (left%60) + ' мин', cls:'text-emerald-400'};
+    }
+    // закрыты — ищем открытие
+    var daysAhead = 0, openDay = day, openAt = 0;
+    if (today && totalMin < today[0]) {
+      openAt = today[0];
+    } else {
+      for (var i=1; i<=7; i++) {
+        var d = (day + i) % 7;
+        if (schedule[d]) { daysAhead = i; openDay = d; openAt = schedule[d][0]; break; }
+      }
+    }
+    var untilOpen = daysAhead*24*60 - totalMin + openAt;
+    if (untilOpen <= 120) return {state:'closed', text:'до открытия ' + Math.floor(untilOpen/60) + ' ч ' + (untilOpen%60) + ' мин', cls:'text-amber-400'};
+    if (daysAhead === 0) return {state:'closed', text:'откроемся в ' + fmtTime(openAt) + ' (МСК)', cls:'text-fg-muted'};
+    if (daysAhead === 1) return {state:'closed', text:'откроемся завтра в ' + fmtTime(openAt) + ' (МСК)', cls:'text-fg-muted'};
+    return {state:'closed', text: 'откроемся в ' + dayNames[openDay] + ' в ' + fmtTime(openAt) + ' (МСК)', cls:'text-fg-muted'};
+  }
+
+  function render() {
+    var el = document.getElementById('work-status');
+    if (!el) return;
+    var dot = el.querySelector('[data-dot]');
+    var txt = el.querySelector('[data-text]');
+    if (!dot || !txt) return;
+    var s = getStatus();
+    txt.textContent = s.text;
+    el.className = 'flex items-center gap-2 text-xs font-medium ' + s.cls;
+    if (s.state === 'open') {
+      dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+    } else {
+      dot.className = 'w-2 h-2 rounded-full bg-amber-500';
+    }
+  }
+  render();
+  setInterval(render, 60*1000);
+})();
+</script>
+</body>
+</html>

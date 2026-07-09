@@ -1,0 +1,27 @@
+{
+  "cities": [
+    { "id": "murom", "name": "Муром", "lat": 55.5756, "lng": 42.0381, "status": "open", "statusLabel": "Открыт", "entryPrice": null },
+    { "id": "vladimir", "name": "Владимир", "lat": 56.1365, "lng": 40.3966, "status": "hub", "statusLabel": "Хаб", "entryPrice": null },
+    { "id": "aleksandrov", "name": "Александров", "lat": 56.3976, "lng": 38.7170, "status": "available", "statusLabel": "Доступен", "entryPrice": 200000 },
+    { "id": "vyazniki", "name": "Вязники", "lat": 56.2458, "lng": 42.1583, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "gorokhovets", "name": "Гороховец", "lat": 56.2028, "lng": 42.6933, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "gus", "name": "Гусь-Хрустальный", "lat": 55.6208, "lng": 40.6750, "status": "available", "statusLabel": "Доступен", "entryPrice": 200000 },
+    { "id": "kameshkovo", "name": "Камешково", "lat": 56.3494, "lng": 40.9947, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "karabanovo", "name": "Карабаново", "lat": 56.3111, "lng": 38.7003, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "kirzhach", "name": "Киржач", "lat": 56.1525, "lng": 38.8603, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "kovrov", "name": "Ковров", "lat": 56.3547, "lng": 41.3156, "status": "available", "statusLabel": "Доступен", "entryPrice": 200000 },
+    { "id": "kolchugino", "name": "Кольчугино", "lat": 56.2973, "lng": 39.3767, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "kosterevo", "name": "Костерёво", "lat": 55.9333, "lng": 39.6333, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "kurlovo", "name": "Курлово", "lat": 55.4500, "lng": 40.5833, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "lakinsk", "name": "Лакинск", "lat": 56.0172, "lng": 39.9494, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "melenki", "name": "Меленки", "lat": 55.3333, "lng": 41.6333, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "petushki", "name": "Петушки", "lat": 55.9333, "lng": 39.4667, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "pokrov", "name": "Покров", "lat": 55.9167, "lng": 39.1833, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "raduzhny", "name": "Радужный", "lat": 56.0000, "lng": 40.3333, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "sobinka", "name": "Собинка", "lat": 55.9833, "lng": 40.0167, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "strunino", "name": "Струнино", "lat": 56.3750, "lng": 38.5833, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "sudogda", "name": "Судогда", "lat": 55.9667, "lng": 40.8667, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "suzdal", "name": "Суздаль", "lat": 56.4226, "lng": 40.4468, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 },
+    { "id": "yuryev", "name": "Юрьев-Польский", "lat": 56.5000, "lng": 39.6833, "status": "available", "statusLabel": "Доступен", "entryPrice": 100000 }
+  ]
+}

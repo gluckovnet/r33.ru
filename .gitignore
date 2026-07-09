@@ -1,0 +1,13 @@
+# Системное
+.ssh/
+.cache/
+__backups/
+
+# Проектное (не для этого сайта)
+____sminta.ru/
+____sminta.ru.zip
+
+# Клиника (steering, orders — не для врачей)
+.kiro/
+orders/
+OBSERVATIONS.md
