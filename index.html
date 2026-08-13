@@ -7,6 +7,7 @@
 <meta name="description" content="Разместите свой бизнес на маркетплейсе 33 региона: клиенты находят вас, платят онлайн, вы получаете 80% чека. Или станьте модератором своего города.">
 <script src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.woff2" as="font" type="font/woff2" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -52,9 +53,22 @@ tailwind.config = {
   input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:24px; height:24px; border-radius:50%; background:#4f6ff0; border:3px solid #fff; box-shadow:0 2px 8px rgba(79,111,240,.4); cursor:pointer; }
   input[type=range]::-moz-range-thumb { width:24px; height:24px; border-radius:50%; background:#4f6ff0; border:3px solid #fff; cursor:pointer; }
   [x-cloak] { display:none !important; }
+  /* Иконки: не показываем «квадраты» пока шрифт не загрузился */
+  .remixicon-loading i[class^="ri-"], .remixicon-loading i[class*=" ri-"] { visibility:hidden; }
 </style>
 </head>
-<body class="font-sans text-ink bg-paper antialiased" x-data="site()" @scroll.window="scrollY = window.pageYOffset">
+<body class="font-sans text-ink bg-paper antialiased remixicon-loading" x-data="site()" @scroll.window="scrollY = window.pageYOffset">
+<script>
+// Показываем иконки только когда шрифт загружен — чтобы не мелькали «квадраты»
+(function(){
+  function ready(){ document.body.classList.remove('remixicon-loading'); }
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load('16px remixicon').then(ready).catch(ready);
+    setTimeout(ready, 1500); // страховка
+  } else { ready(); }
+})();
+</script>
+<!--LiveInternet counter--><script>new Image().src = "https://counter.yadro.ru/hit?r"+escape(document.referrer)+((typeof(screen)=="undefined")?"":";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+";h"+escape(document.title.substring(0,150))+";"+Math.random();</script><!--/LiveInternet-->
 
 <!-- ═══════════════ ТОПБАР ═══════════════ -->
 <div class="bg-paper-soft border-b border-slate-100">
@@ -137,7 +151,7 @@ tailwind.config = {
     </div>
 
     <!-- Мобильное меню -->
-    <div x-show="menu" x-transition class="md:hidden pb-4 space-y-2">
+    <div x-show="menu" x-cloak x-transition class="md:hidden pb-4 space-y-2">
       <div class="flex bg-paper-soft rounded-xl p-1 border border-slate-100">
         <button @click="setMode('seller'); menu=false" :class="mode==='seller' ? 'bg-white text-brand-600 shadow-sm' : 'text-ink-mute'" class="flex-1 px-4 py-2 rounded-lg text-sm font-semibold">Я продавец</button>
         <button @click="setMode('moderator'); menu=false" :class="mode==='moderator' ? 'bg-white text-brand-600 shadow-sm' : 'text-ink-mute'" class="flex-1 px-4 py-2 rounded-lg text-sm font-semibold">Я модератор</button>
@@ -666,7 +680,7 @@ tailwind.config = {
             </div>
             <div>
               <div class="text-xs text-ink-mute mb-0.5">Офис в Муроме</div>
-              <div class="font-bold">ул. Энгельса, 23</div>
+              <div class="font-bold">ул. Куйбышева, 24а</div>
             </div>
           </div>
           <a href="https://vk.ru/evemurom" target="_blank" rel="noopener"
@@ -759,13 +773,13 @@ tailwind.config = {
               :disabled="sending || !agreePd || !agreeOffer"
               :class="(!agreePd || !agreeOffer) ? 'opacity-50 cursor-not-allowed' : ''">
         <span x-show="!sending"><i class="ri-send-plane-line"></i> Отправить заявку</span>
-        <span x-show="sending"><i class="ri-loader-4-line animate-spin"></i> Отправляем…</span>
+        <span x-show="sending" x-cloak><i class="ri-loader-4-line animate-spin"></i> Отправляем…</span>
       </button>
 
-      <div x-show="sent" x-transition class="p-4 rounded-xl bg-mint-50 border border-mint-100 text-mint-600 text-sm text-center font-medium">
+      <div x-show="sent" x-cloak x-transition class="p-4 rounded-xl bg-mint-50 border border-mint-100 text-mint-600 text-sm text-center font-medium">
         <i class="ri-check-line"></i> Заявка №<span x-text="crmId"></span> отправлена. Мы свяжемся с вами в течение дня.
       </div>
-      <div x-show="error" x-transition class="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm text-center">
+      <div x-show="error" x-cloak x-transition class="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm text-center">
         <i class="ri-error-warning-line"></i> Не получилось отправить. Позвоните нам: +7 (4922) 49-42-22
       </div>
     </form>
@@ -918,7 +932,7 @@ tailwind.config = {
           <!-- Плашка: вход -->
           <div class="absolute -top-4 -right-2 sm:-right-4 card px-3.5 py-2.5 shadow-lift bg-white">
             <div class="text-[11px] text-ink-mute leading-none mb-1">Вход от</div>
-            <div class="font-bold text-brand-600 leading-none">100 000 ₽</div>
+            <div class="font-bold text-brand-600 leading-none">20 000 ₽</div>
           </div>
         </div>
       </div>
@@ -1042,25 +1056,26 @@ tailwind.config = {
       <p class="text-lg text-ink-soft">Нажмите город в списке или на карте — увидите цену входа и сможете сразу оставить заявку.</p>
     </div>
 
-    <!-- Тиры -->
-    <div class="grid md:grid-cols-3 gap-5 mb-10">
-      <template x-for="t in tiers" :key="t.n">
-        <div class="card card-hover p-7" :class="t.n === 1 ? 'border-brand-200 ring-1 ring-brand-100' : ''">
-          <div class="flex items-baseline justify-between mb-4">
-            <span class="text-xs font-bold uppercase tracking-wider text-ink-mute" x-text="'Тир ' + t.n"></span>
-            <span x-show="t.n === 1" class="text-xs px-2 py-1 rounded-md bg-brand-500 text-white font-semibold">Крупные</span>
+    <!-- Лестница цены -->
+    <div class="card p-7 mb-10 bg-gradient-to-br from-mint-50/60 to-white border-mint-100">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <h3 class="text-xl font-extrabold">Старт от 20 000 ₽ в любом городе</h3>
+        <span class="text-[13px] text-ink-mute">до 9 модераторов на город · чем позже заходите, тем дороже</span>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <template x-for="(price, i) in priceLadder" :key="i">
+          <div class="px-3 py-2 rounded-xl border text-center"
+               :class="i === 0 ? 'bg-mint-500 text-white border-mint-500' : 'bg-white text-ink-soft border-slate-100'">
+            <div class="text-[11px] opacity-70" x-text="'№' + (i+1)"></div>
+            <div class="font-bold text-[15px]" x-text="fmt(price)"></div>
           </div>
-          <div class="text-4xl font-extrabold text-brand-500 mb-1" x-text="fmt(t.price) + ' ₽'"></div>
-          <div class="text-sm text-ink-mute mb-5">первый модератор</div>
-          <div class="flex flex-wrap gap-1.5">
-            <template x-for="c in t.cities" :key="c">
-              <button @click="pickCityByName(c)"
-                      class="text-[13px] px-2.5 py-1 rounded-lg bg-paper-soft text-ink-soft border border-slate-100 hover:border-brand-300 hover:text-brand-600 transition"
-                      x-text="c"></button>
-            </template>
-          </div>
-        </div>
-      </template>
+        </template>
+      </div>
+      <p class="text-[14px] text-ink-soft leading-relaxed mt-5">
+        Первые заходят дёшево и забирают лучший бизнес города. Чем больше модераторов уже
+        работает — тем выше взнос для следующих. Мест на город девять: когда они заняты,
+        набор в этом городе закрывается.
+      </p>
     </div>
 
     <!-- Карта: наглядно какие города свободны -->
@@ -1093,7 +1108,7 @@ tailwind.config = {
         </div>
 
         <!-- Выбранный город -->
-        <div x-show="selectedCity" x-transition.opacity.duration.300ms
+        <div x-show="selectedCity" x-cloak x-transition.opacity.duration.300ms
              class="mt-4 p-5 rounded-xl bg-paper-soft border border-slate-100 flex flex-wrap items-center justify-between gap-4">
           <div>
             <div class="flex items-center gap-2.5 mb-1">
@@ -1103,8 +1118,8 @@ tailwind.config = {
                     x-text="selectedCity?.statusLabel"></span>
             </div>
             <div class="text-[15px] text-ink-soft">
-              Вход <strong class="text-ink" x-text="fmt(seatPrice) + ' ₽'"></strong>
-              <span class="text-ink-mute" x-text="seat === 1 ? '· вы первый модератор' : '· вы №' + seat + ' модератор'"></span>
+              Вход от <strong class="text-ink">20 000 ₽</strong>
+              <span class="text-ink-mute">· цена растёт с числом модераторов</span>
             </div>
           </div>
           <button @click="takeCity()" class="btn btn-primary !py-2.5 !px-5 !text-sm">
@@ -1114,19 +1129,19 @@ tailwind.config = {
       </div>
     </div>
 
-    <!-- Интерактив: цена по счёту -->
+    <!-- Интерактив: посчитать взнос -->
     <div class="card p-8 bg-gradient-to-br from-sun-50/60 to-white border-sun-100">
       <div class="grid lg:grid-cols-2 gap-8 items-center">
         <div>
           <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sun-500 text-white text-xs font-bold uppercase tracking-wider mb-4">
             <i class="ri-fire-line"></i> Золотая лихорадка
           </div>
-          <h3 class="text-2xl font-extrabold mb-3">Каждому следующему — вдвое дешевле</h3>
+          <h3 class="text-2xl font-extrabold mb-3">Кто раньше — тот дешевле</h3>
           <p class="text-ink-soft leading-relaxed mb-6">
-            Взнос — это доступ к платформе и CRM, а не выкуп города. Модераторов в городе может быть
-            сколько угодно, и они не делят один доход: каждый получает со своих компаний.
-            Первый платит больше, потому что выбирает из всего бизнеса города — позже топ уже занят,
-            поэтому и цена ниже.
+            Взнос — это доступ к платформе и CRM, а не выкуп города. В городе до девяти модераторов,
+            и они не делят один доход: каждый получает со своих компаний. Но чем больше вас уже
+            работает, тем дороже вход для новых — поэтому выгодно заходить первым: дёшево
+            и с лучшим бизнесом города.
           </p>
 
           <div class="mb-2">
@@ -1134,8 +1149,8 @@ tailwind.config = {
               <label class="text-sm font-semibold text-ink-soft">Каким по счёту заходите</label>
               <span class="text-2xl font-extrabold text-sun-600" x-text="'№' + seat"></span>
             </div>
-            <input type="range" min="1" max="6" step="1" x-model.number="seat" class="w-full">
-            <div class="flex justify-between text-xs text-ink-mute mt-2"><span>первый</span><span>шестой</span></div>
+            <input type="range" min="1" max="9" step="1" x-model.number="seat" class="w-full">
+            <div class="flex justify-between text-xs text-ink-mute mt-2"><span>первый</span><span>девятый</span></div>
           </div>
         </div>
 
@@ -1147,7 +1162,7 @@ tailwind.config = {
               <option value="">Выберите город</option>
               <template x-for="c in cities" :key="c.id">
                 <option :value="c.id" :selected="selectedCity?.id === c.id"
-                        x-text="c.name + ' — ' + fmt(c.price) + ' ₽'"></option>
+                        x-text="c.name"></option>
               </template>
             </select>
           </div>
@@ -1155,11 +1170,11 @@ tailwind.config = {
           <div class="p-6 rounded-2xl bg-white border border-slate-100">
             <div class="text-sm text-ink-soft mb-1">Ваш взнос за вход</div>
             <div class="text-5xl font-extrabold text-brand-500 mb-2" x-text="fmt(seatPrice) + ' ₽'"></div>
-            <div class="text-[13px] text-ink-mute" x-show="seat > 1"
-                 x-text="'Первый модератор платил ' + fmt(tierPick) + ' ₽ — но он и выбирал первым'"></div>
             <div class="text-[13px] text-mint-600 font-medium" x-show="seat === 1">
-              <i class="ri-star-fill"></i> Город пустой — забираете лучших
+              <i class="ri-star-fill"></i> Заходите первым — забираете лучший бизнес
             </div>
+            <div class="text-[13px] text-ink-mute" x-show="seat > 1" x-cloak
+                 x-text="'Первый заходил за 20 000 ₽ — но лучшие компании уже могут быть заняты'"></div>
           </div>
 
           <div class="flex items-center gap-3 p-4 rounded-xl bg-mint-50 border border-mint-100">
@@ -1254,7 +1269,7 @@ tailwind.config = {
         </div>
         <h3 class="font-bold mb-2.5">Платят за работу, а не за статус</h3>
         <p class="text-[15px] text-ink-soft leading-relaxed">
-          Модераторов в городе может быть несколько — вы не делите один пирог. Каждая компания
+          В городе до девяти модераторов — вы не делите один пирог. Каждая компания
           закреплена за тем, кто с ней договорился, и процент с её сделок идёт ему, пока аккаунт активен.
         </p>
       </div>
@@ -1400,7 +1415,7 @@ tailwind.config = {
             </div>
             <div>
               <div class="text-xs text-ink-mute mb-0.5">Офис в Муроме</div>
-              <div class="font-bold">ул. Энгельса, 23</div>
+              <div class="font-bold">ул. Куйбышева, 24а</div>
             </div>
           </div>
           <a href="https://vk.ru/evemurom" target="_blank" rel="noopener"
@@ -1436,7 +1451,7 @@ tailwind.config = {
       <div class="card p-7">
         <div class="flex items-center gap-2 mb-4">
           <span class="text-xs px-2.5 py-1 rounded-md bg-slate-100 text-ink-soft font-semibold">Первая версия</span>
-          <span class="font-bold">murom360.ru</span>
+          <span class="font-bold">murom360.ru (пилот)</span>
         </div>
         <p class="text-[15px] text-ink-soft leading-relaxed mb-4">
           Отдельный сайт для Мурома, где движок собран на максимуме: новости, форум, расписание,
@@ -1452,8 +1467,8 @@ tailwind.config = {
 
       <div class="card p-7 border-brand-200 ring-1 ring-brand-100">
         <div class="flex items-center gap-2 mb-4">
-          <span class="text-xs px-2.5 py-1 rounded-md bg-brand-500 text-white font-semibold">Ваша площадка</span>
-          <span class="font-bold">r33.ru</span>
+          <span class="text-xs px-2.5 py-1 rounded-md bg-brand-500 text-white font-semibold">Новая площадка</span>
+          <span class="font-bold">r33.ru (набор модераторов)</span>
         </div>
         <p class="text-[15px] text-ink-soft leading-relaxed mb-4">
           Единый маркетплейс области с делением по городам. Всё лишнее убрано — остались
@@ -1463,7 +1478,7 @@ tailwind.config = {
           <span class="text-[13px] px-2.5 py-1 rounded-lg bg-brand-50 text-brand-600 border border-brand-100 font-medium">бронирование</span>
           <span class="text-[13px] px-2.5 py-1 rounded-lg bg-brand-50 text-brand-600 border border-brand-100 font-medium">онлайн-оплата</span>
           <span class="text-[13px] px-2.5 py-1 rounded-lg bg-brand-50 text-brand-600 border border-brand-100 font-medium">рейтинг</span>
-          <span class="text-[13px] px-2.5 py-1 rounded-lg bg-brand-50 text-brand-600 border border-brand-100 font-medium">приложение продавца</span>
+          <span class="text-[13px] px-2.5 py-1 rounded-lg bg-brand-50 text-brand-600 border border-brand-100 font-medium">приложение</span>
         </div>
       </div>
     </div>
@@ -1474,7 +1489,7 @@ tailwind.config = {
           <i class="ri-smartphone-line text-white text-xl"></i>
         </div>
         <div>
-          <h3 class="font-bold mb-2">Приложение для продавцов</h3>
+          <h3 class="font-bold mb-2">Приложение для продавцов (запланировано)</h3>
           <p class="text-[15px] text-ink-soft leading-relaxed">
             У каждого продавца — приложение, чтобы быстро отвечать клиентам, подтверждать брони
             и держать связь. Чем быстрее ответ, тем больше сделок в вашем городе.
@@ -1529,7 +1544,7 @@ tailwind.config = {
     <div class="text-center mb-10">
       <div class="eyebrow justify-center mb-4"><span class="w-6 h-px bg-brand-400"></span>Заявка</div>
       <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">Готовы обсудить условия?</h2>
-      <p class="text-lg text-ink-soft">Расскажем, сколько модераторов уже в вашем городе, какой у вас будет взнос и что входит.</p>
+      <p class="text-lg text-ink-soft">Расскажем, сколько модераторов уже в вашем городе, какой у вас будет взнос (старт от 20 000 ₽) и что входит.</p>
     </div>
 
     <form @submit.prevent="submit('moderator')" class="card p-7 sm:p-9 space-y-5">
@@ -1597,13 +1612,13 @@ tailwind.config = {
               :disabled="sending || !agreePd || !agreeOffer"
               :class="(!agreePd || !agreeOffer) ? 'opacity-50 cursor-not-allowed' : ''">
         <span x-show="!sending"><i class="ri-send-plane-line"></i> Отправить заявку</span>
-        <span x-show="sending"><i class="ri-loader-4-line animate-spin"></i> Отправляем…</span>
+        <span x-show="sending" x-cloak><i class="ri-loader-4-line animate-spin"></i> Отправляем…</span>
       </button>
 
-      <div x-show="sent" x-transition class="p-4 rounded-xl bg-mint-50 border border-mint-100 text-mint-600 text-sm text-center font-medium">
+      <div x-show="sent" x-cloak x-transition class="p-4 rounded-xl bg-mint-50 border border-mint-100 text-mint-600 text-sm text-center font-medium">
         <i class="ri-check-line"></i> Заявка №<span x-text="crmId"></span> отправлена. Мы свяжемся с вами в течение дня.
       </div>
-      <div x-show="error" x-transition class="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm text-center">
+      <div x-show="error" x-cloak x-transition class="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm text-center">
         <i class="ri-error-warning-line"></i> Не получилось отправить. Позвоните нам: +7 (4922) 49-42-22
       </div>
     </form>
@@ -1635,6 +1650,10 @@ tailwind.config = {
         </div>
         <p class="text-[14px] text-ink-soft leading-relaxed">
           Региональный маркетплейс Владимирской области: услуги, аренда, локальная торговля.
+        </p>
+        <p class="text-[12px] text-ink-mute mt-2">ИНН 333411310227 · ОГРН 307333419200050 · св.33 №001423792 от 11.07.2007г.</p>
+        <p class="text-[11px] text-ink-mute mt-1.5 leading-relaxed">
+          МОСКОВСКИЙ ФИЛИАЛ АО КБ «МОДУЛЬБАНК» г. Москва · Р/с 40802810770010061466 · К/с 30101810645250000092 · БИК 044525092 · Получатель: ИП Алексеев А.С.
         </p>
       </div>
 
@@ -1677,7 +1696,7 @@ tailwind.config = {
           <i class="ri-external-link-line text-mint-600"></i> murom360.ru
         </a>
         <div class="space-y-1.5 text-[13px]">
-          <div class="text-ink-soft">Муром, ул. Энгельса, 23</div>
+          <div class="text-ink-soft">Муром, ул. Куйбышева, 24а</div>
           <a href="tel:+79190024066" class="block text-ink-soft hover:text-mint-600 transition">+7-919-002-40-66</a>
           <a href="tel:+74923424066" class="block text-ink-soft hover:text-mint-600 transition">+7 (49234) 2-40-66</a>
           <a href="https://vk.ru/evemurom" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-ink-soft hover:text-mint-600 transition">
@@ -1693,25 +1712,25 @@ tailwind.config = {
         Не является публичной офертой. Информация носит ознакомительный характер.
         Все сделки — агентский договор (ст. 1005 ГК РФ).
       </p>
-      <p class="text-[12px] text-ink-mute">
-        ИНН 330707947467 · ОГРНИП 321332800023983 от 27.04.2021
-      </p>
-      <p class="text-[12px] text-ink-mute">© 2026 R33 — маркетплейс 33 региона</p>
+      <div class="flex items-center justify-between">
+        <p class="text-[12px] text-ink-mute">© 2026 R33 — маркетплейс 33 региона</p>
+        <!--LiveInternet logo--><a target="_blank" href="https://www.liveinternet.ru/stat/r33.ru" rel="nofollow"><img src="https://counter.yadro.ru/logo?44.5" title="LiveInternet" alt="" style="border:0" width="31" height="31"/></a><!--/LiveInternet-->
+      </div>
     </div>
 
   </div>
 </footer>
 
 <!-- ═══════════════ МОДАЛКА ДОКУМЕНТОВ ═══════════════ -->
-<div x-show="legalOpen" x-transition.opacity class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm" @click.self="legalOpen=false">
-  <div x-show="legalOpen" x-transition.scale class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8 relative shadow-lift">
+<div x-show="legalOpen" x-cloak x-transition.opacity class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm" @click.self="legalOpen=false">
+  <div x-show="legalOpen" x-cloak x-transition.scale class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8 relative shadow-lift">
     <button @click="legalOpen=false" class="absolute top-5 right-5 w-9 h-9 rounded-lg hover:bg-paper-soft flex items-center justify-center transition">
       <i class="ri-close-line text-xl"></i>
     </button>
-    <div x-show="legalLoading" class="text-center py-16">
+    <div x-show="legalLoading" x-cloak class="text-center py-16">
       <i class="ri-loader-4-line animate-spin text-3xl text-brand-500"></i>
     </div>
-    <div x-show="legalError" class="text-center py-16 text-ink-soft">
+    <div x-show="legalError" x-cloak class="text-center py-16 text-ink-soft">
       <i class="ri-file-warning-line text-3xl mb-3 block"></i>
       Документ временно недоступен. Позвоните нам: +7 (4922) 49-42-22
     </div>
@@ -1720,7 +1739,7 @@ tailwind.config = {
 </div>
 
 <!-- ═══════════════ COOKIE-УВЕДОМЛЕНИЕ ═══════════════ -->
-<div x-show="cookieShow" x-transition.opacity.duration.300ms
+<div x-show="cookieShow" x-cloak x-transition.opacity.duration.300ms
      class="fixed bottom-0 left-0 right-0 z-[55] p-4 lg:p-5">
   <div class="max-w-4xl mx-auto card p-5 shadow-lift flex flex-col sm:flex-row items-start sm:items-center gap-4">
     <div class="w-10 h-10 rounded-xl bg-sun-50 flex items-center justify-center shrink-0">
@@ -1745,7 +1764,7 @@ tailwind.config = {
 
 <!-- ═══════════════ КНОПКА НАВЕРХ ═══════════════ -->
 <button @click="window.scrollTo({top:0,behavior:'smooth'})"
-        x-show="scrollY > 400" x-transition.opacity.duration.300ms
+        x-show="scrollY > 400" x-cloak x-transition.opacity.duration.300ms
         class="fixed bottom-24 lg:bottom-8 right-5 z-40 w-12 h-12 rounded-full bg-brand-500 text-white shadow-lift flex items-center justify-center hover:bg-brand-600 transition">
   <i class="ri-arrow-up-line text-xl"></i>
 </button>
@@ -1775,9 +1794,9 @@ function site() {
     mCheck: 1000,
     selfConnect: false,
 
-    // цена входа
+    // цена входа — лестница, одна на все города
     seat: 1,
-    tierPick: 200000,
+    priceLadder: [20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000],
 
     // форма
     form: { name:'', phone:'', city:'', biz:'', note:'' },
@@ -1800,16 +1819,11 @@ function site() {
 
     modSteps: [
       { t:'Выберите город',        d:'Посмотрите, сколько модераторов уже работает и какой взнос.' },
-      { t:'Уточните взнос',        d:'Чем больше модераторов уже в городе, тем дешевле вход.' },
+      { t:'Уточните взнос',        d:'Старт от 20 000 ₽. Чем больше модераторов уже в городе, тем дороже вход.' },
       { t:'Оформите доступ',       d:'Агентский договор, оплата, доступ к CRM.' },
       { t:'Выходите в город',      d:'Подключайте лучший бизнес, пока его не забрали.' },
     ],
 
-    tiers: [
-      { n:1, price:200000, cities:['Владимир','Ковров','Муром'] },
-      { n:2, price:150000, cities:['Суздаль','Александров','Гусь-Хрустальный','Покров','Киржач'] },
-      { n:3, price:100000, cities:['Юрьев-Польский','Вязники','Гороховец','Камешково','Кольчугино','Костерёво','Курлово','Лакинск','Меленки','Петушки','Радужный','Собинка','Струнино','Судогда'] },
-    ],
 
     selectedCity: null,
 
@@ -1867,8 +1881,10 @@ function site() {
     // ── вычисляемое ──
     get sellerMonth() { return Math.round(this.check * 0.80 * this.orders); },
     get modMonth()    { return Math.round(this.mCheck * (this.selfConnect ? 0.06 : 0.03) * this.deals * 30); },
-    get cityBase()    { return this.selectedCity ? this.selectedCity.price : this.tierPick; },
-    get seatPrice()   { return Math.round(this.cityBase / Math.pow(2, this.seat - 1)); },
+    get seatPrice()   {
+      var i = Math.min(this.seat - 1, this.priceLadder.length - 1);
+      return this.priceLadder[i];
+    },
 
     get rolesView() {
       const self = this.selfConnect;
@@ -1972,7 +1988,6 @@ function site() {
         m.bindTooltip(c.name, { direction:'top', offset:[0,-8] });
         m.on('click', function() {
           self.selectedCity = c;
-          self.tierPick = c.price;
           self.map.setView([c.lat, c.lng], 10, { animate:true });
         });
       });
@@ -1986,9 +2001,7 @@ function site() {
     takeCity() {
       if (this.selectedCity) {
         this.form.city = this.selectedCity.name;
-        this.form.note = 'Хочу занять город ' + this.selectedCity.name +
-                         ', вхожу ' + this.seat + '-м модератором. Взнос ' +
-                         this.fmt(this.seatPrice) + ' ₽.';
+        this.form.note = 'Хочу стать модератором в городе ' + this.selectedCity.name + '.';
       }
       this.go('moderator-form');
     },
@@ -1997,7 +2010,6 @@ function site() {
       var c = this.cities.find(x => x.name === name);
       if (!c) return;
       this.selectedCity = c;
-      this.tierPick = c.price;
       if (this.map) this.map.setView([c.lat, c.lng], 10, { animate: true });
       this.go('cities');
     },
@@ -2006,7 +2018,6 @@ function site() {
       var c = this.cities.find(x => x.id === id);
       if (!c) { this.selectedCity = null; return; }
       this.selectedCity = c;
-      this.tierPick = c.price;
       if (this.map) this.map.setView([c.lat, c.lng], 10, { animate: true });
     },
 
